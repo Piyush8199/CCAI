@@ -1,0 +1,35 @@
+% Distance facts
+dist(a, b, 10).
+dist(a, c, 15).
+dist(a, d, 20).
+dist(b, c, 35).
+dist(b, d, 25).
+dist(c, d, 30).
+
+% Make distance symmetric
+distance(X,Y,D) :- dist(X,Y,D).
+distance(X,Y,D) :- dist(Y,X,D).
+
+% Compute cost of a given tour (list of cities, start city repeated at end)
+tour_cost([_], 0).
+tour_cost([C1,C2|Rest], Cost) :-
+    distance(C1, C2, D),
+    tour_cost([C2|Rest], SubCost),
+    Cost is D + SubCost.
+
+% Solve TSP from Start City
+tsp(Start, BestPath, MinCost) :-
+    findall(C, (dist(C,_,_); dist(_,C,_)), CitiesDup),
+    sort(CitiesDup, Cities),
+    delete(Cities, Start, OtherCities),
+    findall(Cost-Path,
+            (
+              permutation(OtherCities, Permuted),
+              append([Start|Permuted], [Start], Path),
+              tour_cost(Path, Cost)
+            ),
+            CostedTours),
+    keysort(CostedTours, [MinCost-BestPath|_]).
+
+Querry-
+Tsp(a,Path,Cost).
