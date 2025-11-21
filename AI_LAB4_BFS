@@ -1,40 +1,70 @@
-% solve(Start, Solution).
-%  Solution is a path (in reverse order)
-%  from Start to a goal.
+% ---------------------------------------
+% Undirected graph (subset of Romania map)
+% ---------------------------------------
+edge(arad, sibiu, 140).
+edge(sibiu, fagaras, 99).
+edge(sibiu, rimnicu, 80).
+edge(fagaras, bucharest, 211).
+edge(rimnicu, pitesti, 97).
+edge(pitesti, bucharest, 101).
 
-solve(Start, Solution) :-
-  breadthfirst([[Start]], Solution).
+% Make edges undirected
+adj(X, Y) :- edge(X, Y, _).
+adj(X, Y) :- edge(Y, X, _).
 
-% breadthfirst([Path1, Path2, ...], Solution).
-%  Solution is an extension to a goal of
-%  one of the paths.
+% ---------------------------------------
+% Heuristic: straight-line distance to Bucharest (example values)
+% (Only relative ranking matters for greedy best-first)
+% ---------------------------------------
+heuristic(arad, 366).
+heuristic(sibiu, 253).
+heuristic(fagaras, 176).
+heuristic(rimnicu, 193).
+heuristic(pitesti, 100).
+heuristic(bucharest, 0).
 
-breadthfirst([[Node|Path]|_], [Node|Path]) :-
-  goal(Node).
-  % Always first check if goal reached
+% ---------------------------------------
+% Public API
+% ---------------------------------------
+% best_first(+Start, +Goal, -Path)
+best_first(Start, Goal, Path) :-
+    heuristic(Start, H0),
+    gbfs([H0-[Start]], Goal, RevPath, false),
+    reverse(RevPath, Path).
 
-% If not, then extend this path by all
-% possible edges, put these new paths on the
-% end of the queue (Paths1) to check, and do
-% breadthfirst on this new collection of
-% paths, Paths1:
-breadthfirst([Path|Paths], Solution) :-
-  extend(Path, NewPaths),
-  conc(Paths, NewPaths, Paths1),
-  breadthfirst(Paths1, Solution).
+% best_first_debug(+Start, +Goal, -Path)
+%   Same as best_first/3, but prints expansions and frontier at each step.
+best_first_debug(Start, Goal, Path) :-
+    heuristic(Start, H0),
+    gbfs([H0-[Start]], Goal, RevPath, true),
+    reverse(RevPath, Path).
 
-% extend([N|Rest], NewPaths).
-% Extend the path [N|Rest] using all edges
-% through N that are not already on the path.
-% This produces a list NewPaths.
-extend([Node|Path], NewPaths) :-
-  findall([NewNode, Node|Path],
-          (edge(Node, NewNode),
-           not(member(NewNode,[Node|Path]))),
-          NewPaths),
-  !.
-extend(Path,[]). %findall failed: no edge
+% ---------------------------------------
+% Greedy Best-First core
+% Open list is a list of H-Path pairs, kept sorted by H (ascending)
+% ---------------------------------------
+gbfs([_H-[Goal|Rest] | _], Goal, [Goal|Rest], _Debug) :- !.
+gbfs([_H-[Current|RestPath] | Open], Goal, Path, Debug) :-
+    ( Debug == true ->
+        format('Expanding: ~w~n', [Current]),
+        print_frontier([_H-[Current|RestPath] | Open])
+    ;   true
+    ),
+    findall(H1-[Next,Current|RestPath],
+            ( adj(Current, Next),
+              \+ member(Next, [Current|RestPath]),   % avoid cycles
+              heuristic(Next, H1)
+            ),
+            Children),
+    append(Open, Children, Open1),
+    keysort(Open1, OpenSorted),  % sort by heuristic key
+    gbfs(OpenSorted, Goal, Path, Debug).
 
-edge(1, 2). edge(1, 3). edge(2, 4).
-edge(3, 5). edge(5, 6).
-goal(3).
+print_frontier(Frontier) :-
+    findall((H,Head),
+            ( member(H-[Head|_], Frontier) ),
+            Pairs),
+    format('Frontier (H,Node): ~w~n~n', [Pairs]).
+
+Querry- 
+Best_first(arad,Bucharest,Path).
