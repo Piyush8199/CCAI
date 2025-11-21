@@ -1,0 +1,35 @@
+1)Programe
+red(rose).
+likes(bill ,cindy).
+owns(john ,gold).
+Output:
+Goal
+queries
+?-likes(ram,What).
+What= mango
+?-likes(Who,cindy).
+Who= cindy
+?-red(What).
+What= rose
+?-owns(Who,What).
+Who= john
+What= gold.
+2) Program:
+Production rules:
+Arithmetic:
+c_to_f f is c * 9 / 5 +32
+freezing f < = 32
+Rules:
+c_to_f(C,F) :-
+F is C * 9 / 5 + 32.
+freezing(F) :-
+F =< 32.
+Output:
+Queries:
+?- c_to_f(100,X).
+X = 212
+Yes
+?- freezing(15)
+.Yes
+?- freezing(45).
+No
