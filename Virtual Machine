@@ -23,11 +23,17 @@ print("Prime" if is_prime else "Not Prime")
 
 ### 3 Fibonacci Series up to n Terms
 
-n = int(input("Enter terms: "))
-a, b = 0, 1
-for _ in range(n):
-    print(a, end=" ")
-    a, b = b, a + b
+n = int(input("Enter how many terms: "))
+
+a = 0
+b = 1
+
+for i in range(n):
+    print(a)
+    c = a + b
+    a = b
+    b = c
+
 
 
 ---
