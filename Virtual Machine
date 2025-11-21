@@ -39,7 +39,3 @@ for i in range(n):
     b = c
 
 
-
----
-
-If you want even **shorter versions** (one-liners / minimal code), I can provide those too!
