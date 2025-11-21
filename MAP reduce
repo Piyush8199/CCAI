@@ -1,0 +1,31 @@
+# 1. Word Count in a Text File
+
+from functools import reduce
+with open("sample.txt", "r") as f:
+    text = f.read()
+words = text.split()
+mapped = list(map(lambda w: (w, 1), words))
+
+def reducer(acc, pair):
+    word = pair[0]
+    count = pair[1]
+    acc[word] = acc.get(word, 0) + count
+    return acc
+
+word_count = reduce(reducer, mapped, {})
+
+print("Word Count:")
+print(word_count)
+
+# 2. Square of Each Number Using map()
+
+numbers = [1, 2, 3, 4, 5]
+squares = list(map(lambda x: x*x, numbers))
+print("Squares:", squares)
+
+
+#3. Cube of Each Number Using map()
+
+numbers = [1, 2, 3, 4, 5]
+cubes = list(map(lambda x: x*x*x, numbers))
+print("Cubes:", cubes)
